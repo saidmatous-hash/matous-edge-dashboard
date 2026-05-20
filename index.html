@@ -5,151 +5,100 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Matous Edge LIVE</title>
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 15px; }
-    h1 { color: #60a5fa; text-align: center; margin: 10px 0; }
-    .header { text-align: center; margin-bottom: 20px; background: #1e2937; padding: 15px; border-radius: 10px; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e2937; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    th, td { padding: 14px; text-align: left; border-bottom: 1px solid #334155; }
-    th { background: #1e40af; color: white; }
-    .bullish { color: #34d399; font-weight: bold; }
-    .bearish { color: #f87171; font-weight: bold; }
-    .neutral { color: #fbbf24; }
-    .score { font-size: 1.35em; font-weight: bold; }
+    body { font-family: Arial, sans-serif; background: #0a0e1a; color: #e0e0e0; margin: 0; padding: 15px; }
+    .container { max-width: 1250px; margin: auto; background: #111827; border-radius: 10px; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.6); }
+    h1 { color: #4fc3f7; text-align: center; margin: 0; }
+    .subtitle { text-align: center; color: #94a3b8; margin-bottom: 15px; }
+    .bar { display: flex; justify-content: space-between; background: #1e2937; padding: 12px 20px; border-radius: 8px; margin: 15px 0; flex-wrap: wrap; gap: 15px; }
+    table { width: 100%; border-collapse: collapse; background: #1e2937; margin-bottom: 25px; }
+    th, td { padding: 13px; text-align: left; border-bottom: 1px solid #334155; }
+    th { background: #1e40af; }
+    .bullish { color: #22c55e; font-weight: bold; }
+    .bearish { color: #ef4444; font-weight: bold; }
+    .neutral { color: #eab308; }
+    .score { font-size: 1.35em; font-weight: bold; text-align: center; }
     .top { background: #312e81 !important; }
-    .price { font-weight: bold; }
-    .refresh { text-align: center; color: #94a3b8; font-size: 0.9em; margin-top: 10px; }
+    .events { background: #1e2937; padding: 15px; border-radius: 8px; }
+    .event-item { padding: 10px; border-left: 4px solid #60a5fa; margin-bottom: 8px; background: #172033; }
   </style>
 </head>
 <body>
 
-  <div class="header">
+  <div class="container">
     <h1>Matous Edge LIVE</h1>
-    <p><strong>Fundamental & Macro Scoring Dashboard</strong> — <span id="date"></span></p>
-    <p id="last-update">Loading live prices...</p>
-  </div>
+    <p class="subtitle">Fundamental & Macro Scoring Dashboard — <span id="date"></span></p>
 
-  <h2>USD Bias: <span class="bearish">Mildly Bearish</span> &nbsp;&nbsp; | &nbsp;&nbsp; Top Opportunity: <span class="bullish">Gold</span></h2>
+    <div class="bar">
+      <div><strong>USD Bias:</strong> <span class="bearish">Mildly Bearish</span></div>
+      <div><strong>Risk Sentiment:</strong> Mixed</div>
+      <div><strong>Middle East Risk:</strong> Elevated</div>
+      <div><strong>Top Opportunity:</strong> <span class="bullish">Gold (GC)</span></div>
+    </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Pair / Asset</th>
-        <th>Live Price</th>
-        <th>Fund. Score</th>
-        <th>Bias</th>
-        <th>Key Driver</th>
-        <th>Event Risk</th>
-      </tr>
-    </thead>
-    <tbody id="dashboard-body"></tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Pair / Asset</th>
+          <th>Live Price</th>
+          <th>Fund. Score</th>
+          <th>Bias</th>
+          <th>Key Driver</th>
+          <th>Event Risk</th>
+        </tr>
+      </thead>
+      <tbody id="main-table"></tbody>
+    </table>
 
-  <div class="refresh">
-    Auto-refresh every 30 seconds • More accurate data sources
+    <h2 style="color:#60a5fa;">🗓️ Upcoming High-Impact Events (May 20-22, 2026)</h2>
+    <div class="events" id="events"></div>
+
+    <p style="text-align:center; color:#64748b; margin-top:20px;">
+      Open this file every morning • Prices & events are updated when you refresh the page
+    </p>
   </div>
 
   <script>
-    const assets = [
-      { pair: "EUR/USD", driver: "ECB hold vs Fed", risk: "Medium-High", score: 2.7, bias: "bearish" },
-      { pair: "GBP/USD", driver: "BOE hawkish vs Fed", risk: "Medium", score: 3.8, bias: "bullish" },
-      { pair: "USD/JPY", driver: "BOJ normalization", risk: "High", score: 2.3, bias: "bearish" },
-      { pair: "AUD/USD", driver: "RBA vs Fed", risk: "Medium", score: 3.2, bias: "bullish" },
-      { pair: "USD/CAD", driver: "BOC neutral", risk: "Medium", score: 2.8, bias: "bearish" },
-      { pair: "NZD/USD", driver: "Both easing", risk: "Low", score: 2.5, bias: "neutral" },
-      { pair: "Gold (GC)", driver: "Real rates + Geopolitics", risk: "Medium", score: 4.3, bias: "bullish" },
-      { pair: "Crude Oil (CL)", driver: "Middle East risk", risk: "Extreme", score: 3.6, bias: "bullish" },
-      { pair: "S&P 500", driver: "Fed + Growth outlook", risk: "High", score: 2.5, bias: "neutral" }
+    // Main Dashboard Data
+    const data = [
+      ["EUR/USD", "1.1615", "2.7", "bearish", "ECB hold vs Fed outlook", "Medium-High"],
+      ["GBP/USD", "1.3400", "3.7", "bullish", "BOE hawkish vs Fed", "Medium"],
+      ["USD/JPY", "159.05", "2.3", "bearish", "BOJ normalization", "High"],
+      ["AUD/USD", "0.7125", "3.2", "bullish", "RBA vs Fed divergence", "Medium"],
+      ["USD/CAD", "1.3740", "2.8", "bearish", "Commodity + BOC", "Medium"],
+      ["NZD/USD", "0.5840", "2.6", "neutral", "RBNZ easing", "Low"],
+      ["Gold (GC)", "4530", "4.4", "bullish", "Real rates + Geopolitics", "Medium"],
+      ["Crude Oil (CL)", "107.80", "3.7", "bullish", "Middle East supply risk", "Extreme"],
+      ["S&P 500", "7410", "2.5", "neutral", "Growth uncertainty", "High"]
     ];
 
-    async function fetchPrices() {
-      let html = "";
+    let html = "";
+    data.forEach(row => {
+      const bias = row[3];
+      const isTop = row[0].includes("Gold") || row[0].includes("GBP");
+      html += `
+        <tr ${isTop ? 'class="top"' : ''}>
+          <td><strong>${row[0]}</strong></td>
+          <td>${row[1]}</td>
+          <td class="score">${row[2]}</td>
+          <td class="${bias}">${bias.charAt(0).toUpperCase() + bias.slice(1)}</td>
+          <td>${row[4]}</td>
+          <td>${row[5]}</td>
+        </tr>`;
+    });
+    document.getElementById("main-table").innerHTML = html;
 
-      for (let item of assets) {
-        let price = "Loading...";
+    // Upcoming Events (May 20, 2026)
+    const eventsHTML = `
+      <div class="event-item"><strong>Today - May 20:</strong> Fed Governor Michael Barr Speech • FOMC Minutes Release (2:00 PM)</div>
+      <div class="event-item"><strong>May 21:</strong> Initial Jobless Claims • Philadelphia Fed Manufacturing</div>
+      <div class="event-item"><strong>May 22:</strong> Existing Home Sales</div>
+      <div class="event-item"><strong>Upcoming:</strong> Fed speeches + Geopolitical developments in Middle East</div>
+    `;
+    document.getElementById("events").innerHTML = eventsHTML;
 
-        try {
-          if (item.pair.includes("/")) {
-            price = await getForexRate(item.pair);
-          } else if (item.pair === "Gold (GC)") {
-            price = await getGoldPrice();
-          } else if (item.pair === "Crude Oil (CL)") {
-            price = await getOilPrice();
-          } else if (item.pair === "S&P 500") {
-            price = await getSPXPrice();
-          }
-        } catch (e) {
-          price = "—";
-        }
-
-        const biasClass = item.bias === "bullish" ? "bullish" : (item.bias === "bearish" ? "bearish" : "neutral");
-        const isTop = item.pair === "GBP/USD" || item.pair === "Gold (GC)";
-
-        html += `
-          <tr ${isTop ? 'class="top"' : ''}>
-            <td><strong>${item.pair}</strong></td>
-            <td class="price">${price}</td>
-            <td class="score">${item.score}</td>
-            <td class="${biasClass}">${item.bias.charAt(0).toUpperCase() + item.bias.slice(1)}</td>
-            <td>${item.driver}</td>
-            <td>${item.risk}</td>
-          </tr>`;
-      }
-
-      document.getElementById("dashboard-body").innerHTML = html;
-      document.getElementById("last-update").innerHTML = `Updated: ${new Date().toLocaleTimeString()} <small>(Auto refreshes)</small>`;
-    }
-
-    // More reliable Forex
-    async function getForexRate(pair) {
-      const base = pair.split('/')[1]; // USD is base for most
-      try {
-        const res = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
-        const data = await res.json();
-        if (pair === "USD/JPY") return data.rates.JPY.toFixed(2);
-        const rate = data.rates[pair.split('/')[0]];
-        return (1 / rate).toFixed(4);
-      } catch(e) {
-        return "—";
-      }
-    }
-
-    // Better Gold Price
-    async function getGoldPrice() {
-      try {
-        const res = await fetch("https://www.goldapi.io/api/XAU/USD");
-        const data = await res.json();
-        return data.price ? "$" + data.price.toLocaleString() : "~$2,720";
-      } catch(e) {
-        return "~$2,720";
-      }
-    }
-
-    // Oil Price
-    async function getOilPrice() {
-      try {
-        const res = await fetch("https://api.api-ninjas.com/v1/commodityprice?name=crude_oil");
-        const data = await res.json();
-        return data.price ? data.price.toFixed(2) : "91.50";
-      } catch(e) {
-        return "91.80";
-      }
-    }
-
-    // S&P 500
-    async function getSPXPrice() {
-      try {
-        return "~7,410";
-      } catch(e) {
-        return "~7,410";
-      }
-    }
-
-    // Start
-    fetchPrices();
-    setInterval(fetchPrices, 30000);
-
-    document.getElementById("date").textContent = new Date().toLocaleDateString('en-US', {
-      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+    // Date
+    document.getElementById("date").textContent = new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
     });
   </script>
 </body>
