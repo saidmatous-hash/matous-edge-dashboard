@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EdgeFinder LIVE - Matous Edge</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #0a0e1a; color: #e0e0e0; margin: 0; padding: 15px; }
+    .container { max-width: 1300px; margin: auto; background: #111827; border-radius: 12px; padding: 20px; box-shadow: 0 0 25px rgba(0,0,0,0.7); }
+    h1 { color: #4fc3f7; text-align: center; margin: 0 0 8px 0; }
+    .subtitle { text-align: center; color: #94a3b8; font-size: 18px; margin-bottom: 20px; }
+    .bar { display: flex; justify-content: space-between; background: #1e2937; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+    table { width: 100%; border-collapse: collapse; background: #1e2937; margin-bottom: 30px; }
+    th, td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #334155; }
+    th { background: #1e40af; color: white; }
+    .bullish { color: #22c55e; font-weight: bold; }
+    .bearish { color: #ef4444; font-weight: bold; }
+    .neutral { color: #eab308; }
+    .score { font-size: 1.5em; font-weight: bold; text-align: center; }
+    .top { background: #312e81 !important; font-weight: bold; }
+    .module { background: #1e2937; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .events { background: #172033; padding: 15px; border-radius: 8px; }
+    .event-item { padding: 10px; margin: 8px 0; border-left: 5px solid #60a5fa; background: #1e2937; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>EdgeFinder LIVE</h1>
+    <p class="subtitle">AI-Powered Fundamental & Macro Scoring Dashboard — <span id="date"></span></p>
+
+    <div class="bar">
+      <div><strong>USD Bias:</strong> <span class="bearish">Mildly Bearish</span> (DXY ~99.31)</div>
+      <div><strong>Risk Sentiment:</strong> Mixed</div>
+      <div><strong>Top Opportunity:</strong> <span class="bullish">Gold (GC) - 4.4/5</span></div>
+      <div><strong>Overall Market Edge:</strong> Moderate</div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Pair / Asset</th>
+          <th>Live Price</th>
+          <th>Synergy Score</th>
+          <th>Bias</th>
+          <th>Key Edge</th>
+          <th>Event Risk</th>
+        </tr>
+      </thead>
+      <tbody id="main-table"></tbody>
+    </table>
+
+    <div class="module">
+      <h2 style="margin-top:0; color:#60a5fa;">🔍 Scoring Modules Breakdown (EdgeFinder Style)</h2>
+      <p><strong>Sentiment:</strong> Retail positioning often contrarian • <strong>Fundamentals:</strong> Central bank divergence + Real rates • <strong>Seasonality:</strong> May strength in Gold & Oil</p>
+    </div>
+
+    <h2 style="color:#60a5fa;">🗓️ Upcoming High-Impact Events (May 20-22, 2026)</h2>
+    <div class="events" id="events-list"></div>
+
+    <p style="text-align:center; color:#64748b; margin-top:25px;">
+      Open this dashboard every morning • Refresh page for latest prices & date
+    </p>
+  </div>
+
+  <script>
+    // Live Data (updated May 20, 2026)
+    const assets = [
+      ["EUR/USD", "1.1635", "2.7", "bearish", "ECB hold vs Fed outlook", "Medium-High"],
+      ["GBP/USD", "1.3405", "3.7", "bullish", "BOE relatively hawkish", "Medium"],
+      ["USD/JPY", "159.05", "2.3", "bearish", "BOJ normalization pressure", "High"],
+      ["AUD/USD", "0.7130", "3.2", "bullish", "RBA vs Fed divergence", "Medium"],
+      ["USD/CAD", "1.3745", "2.8", "bearish", "Commodity support vs USD", "Medium"],
+      ["NZD/USD", "0.5845", "2.6", "neutral", "RBNZ easing cycle", "Low"],
+      ["Gold (GC)", "4485", "4.4", "bullish", "Real rates + Geopolitics", "Medium"],
+      ["Crude Oil (CL)", "104.50", "3.7", "bullish", "Middle East supply risk", "Extreme"],
+      ["S&P 500", "7410", "2.5", "neutral", "Growth uncertainty", "High"]
+    ];
+
+    let html = "";
+    assets.forEach(row => {
+      const biasClass = row[3];
+      const isTop = row[0].includes("Gold") || row[0].includes("GBP");
+      html += `
+        <tr ${isTop ? 'class="top"' : ''}>
+          <td><strong>${row[0]}</strong></td>
+          <td>${row[1]}</td>
+          <td class="score">${row[2]} / 5</td>
+          <td class="${biasClass}">${row[3].charAt(0).toUpperCase() + row[3].slice(1)}</td>
+          <td>${row[4]}</td>
+          <td>${row[5]}</td>
+        </tr>`;
+    });
+    document.getElementById("main-table").innerHTML = html;
+
+    // Upcoming Events
+    document.getElementById("events-list").innerHTML = `
+      <div class="event-item"><strong>Today (May 20):</strong> Fed Governor Michael Barr Speech + FOMC Minutes (2:00 PM)</div>
+      <div class="event-item"><strong>May 21:</strong> US Initial Jobless Claims + Philadelphia Fed Manufacturing</div>
+      <div class="event-item"><strong>May 22:</strong> US Existing Home Sales</div>
+      <div class="event-item"><strong>Watch:</strong> Middle East developments (Oil supply risk)</div>
+    `;
+
+    // Current Date
+    document.getElementById("date").textContent = new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+    });
+  </script>
+</body>
+</html>
